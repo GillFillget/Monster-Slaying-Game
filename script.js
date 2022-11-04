@@ -1,61 +1,55 @@
+const ctx = document.getElementById('myCanvas').getContext('2d');
+const canvas = document.getElementById('myCanvas');
+let posValue = 0;
 let Protag;
 let Display;
 let Scale;
 let Rock = [];
-let RockCount = 10;
+let RockCount = 20;
 let menuSelect = 0;
 //screenspace is the type of screen the player is currently in
 //0 is a title screen, 1 is navigating, 2 is fight screen, 3 is player menu
 let screenSpace = 0;
 let menuBuild = [];
 
-function startGame() {
-    myGameArea.start();
-    Scale = myGameArea.canvas.width / 20;
+
+function init(){
+    Scale = canvas.width / 20;
     Protag = new Player();
     Display = new ScreenMode();
     for (i = 0; i < RockCount; i++) {
-    Rock[i] = new Stone(Scale * parseInt(Math.random(1,myGameArea.canvas.width / Scale - 1)),Scale * parseInt(Math.random(1,myGameArea.canvas.height / Scale - 2)));
-  }
-  for (i = 0; i < 3; i++) {
-    menuBuild[i] = new SelectionTier(Scale * 15, Scale * (1.5 * i + 9.5));
-  }
+    Rock[i] = new Stone(Scale * parseInt(random(1, canvas.width / Scale - 1)),Scale * parseInt(random(1, canvas.height / Scale - 1)));
+    }
+     for (i = 0; i < 3; i++) {
+        menuBuild[i] = new SelectionTier(Scale * 15, Scale * (1.5 * i + 11));
+     }
+    window.requestAnimationFrame(draw);
 }
 
-var myGameArea = {
-    canvas : document.createElement("canvas"),
-    start : function() {
-        this.canvas.width = 480;
-        this.canvas.height = 270;
-        this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.frameNo = 0;
-        this.interval = setInterval(updateGameArea, 20);
-        },
-    clear : function() {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-}
-
-function updateGameArea() {
-    myGameArea.clear();
-    if (screenSpace === 0) {
-        Display.title();
-      }
-      if (screenSpace == 1) {
-        Display.game();
-      }
-      if (screenSpace == 2) {
-        Display.fight();
-      }
-      if (screenSpace == 3) {
-        Display.menu();
-        for (i = 0; i < menuBuild.length; i++) {
-          menuBuild[i].draw();
-          menuBuild[i].selected = false;
-          menuBuild[menuSelect].selected = true;
-        }
-    }
+function draw(){
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
+        //looping code
+        if (screenSpace === 0) {
+            Display.title();
+          }
+          if (screenSpace == 1) {
+            Display.game();
+          }
+          if (screenSpace == 2) {
+            Display.fight();
+          }
+          if (screenSpace == 3) {
+            Display.menu();
+            for (i = 0; i < menuBuild.length; i++) {
+              menuBuild[i].draw();
+              menuBuild[i].selected = false;
+              menuBuild[menuSelect].selected = true;
+            }
+          }
+    ctx.fillStyle = "rgba(200, 200, 200, 0.1)";
+    rect(0,0,canvas.width,canvas.height);
+    window.requestAnimationFrame(draw);
 }
 
 class Player {
@@ -74,7 +68,7 @@ class Player {
       if (direction === 0) {
         this.position[1] += this.scale * -1;
         if (this.position[1] < 0) {
-          this.position[1] =myGame.canvas.height - this.scale * 2;
+          this.position[1] = canvas.height - this.scale * 2;
           regenField();
         }
         for (i = 0; i < RockCount; i++) {
@@ -86,7 +80,7 @@ class Player {
       if (direction == 1) {
         this.position[0] += this.scale * -1;
         if (this.position[0] < 0) {
-          this.position[0] =myGameArea.canvas.width - this.scale;
+          this.position[0] = canvas.width - this.scale;
           regenField();
         }
         for (i = 0; i < RockCount; i++) {
@@ -97,7 +91,7 @@ class Player {
       }
       if (direction == 2) {
         this.position[1] += this.scale;
-        if (this.position[1] >myGameArea.canvas.height - this.scale * 2) {
+        if (this.position[1] > canvas.height - this.scale * 2) {
           this.position[1] = 0;
           regenField();
         }
@@ -109,7 +103,7 @@ class Player {
       }
       if (direction == 3) {
         this.position[0] += this.scale;
-        if (this.position[0] >myGameArea.canvas.width - this.scale) {
+        if (this.position[0] > canvas.width - this.scale) {
           this.position[0] = 0;
           regenField();
         }
@@ -135,19 +129,16 @@ class Player {
 
   class ScreenMode {
     title() {
-      rect(-1,-1,myGameArea.canvas.width,200);
-      text(
-        "Press Z to explore the shifting fields to battle monsters and get stronger",
-        Scale * 5,
-        200
-      );
+      //rect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = 'black';
+      ctx.fillText("Press Z to explore the shifting fields to battle monsters and get stronger",Scale * 5,200);
     }
     game() {
-      background(200);
-      fill(255);
+      //rect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = 'black';
       Protag.draw();
-      fill(100);
       for (i = 0; i < RockCount; i++) {
+        ctx.fillStyle = 'grey';
         Rock[i].draw();
       }
     }
@@ -163,10 +154,65 @@ class Player {
       this.scale = Scale;
     }
     draw() {
-      rect(this.position[0], this.position[1], this.scale, this.scale);
+    rect(this.position[0], this.position[1], this.scale, this.scale);
+    }
+  }
+
+
+function Affirm() {
+    if (screenSpace == 3) {
+      if (menuSelect == 0&&Protag.exp[1]>=100) {
+        menuSelect = 3;
+        levelUP();
+      } else if (menuSelect == 1) {
+        Protag.currentVital[0] += Protag.vitalMax[0] / 2;
+        if (Protag.currentVital[0] > Protag.vitalMax[0]) {
+          Protag.currentVital[0] = Protag.vitalMax[0];
+        }
+      } else if (menuSelect == 2) {
+        screenSpace = 1;
+        menuSelect = 0;
+        while(menuBuild.length > 3){
+          menuBuild.pop();
+        }
+      }
+    } else if (screenSpace == 1) {
+      screenSpace = 3;
     }
   }
   
+  function regenField() {
+    for (i = 0; i < RockCount; i++) {
+      Rock[i].position[0] = Scale * parseInt(random(1, (canvas.width / Scale - 1)));
+      Rock[i].position[1] = Scale * parseInt(random(1, (canvas.height / Scale - 1)));
+    }
+  }
+  
+  function playerMenu() {
+    ctx.fillStyle = "rgba(0, 0, 200, 0)";
+    rect(0, canvas.height - Scale * 6, canvas.width, Scale * 6);
+    ctx.fillStyle = 'black';
+    ctx.fillText("Level: " + Protag.exp[0], Scale * 2, canvas.height - Scale * 5);
+    ctx.fillText("Experience: " + Protag.exp[1], Scale * 2, canvas.height - Scale * 4);
+    ctx.fillText("Health: " + Protag.currentVital[0] + "/" + Protag.vitalMax[0],Scale * 2, canvas.height - Scale * 3);
+    ctx.fillText("Endurance: " + Protag.currentVital[1] + "/" + Protag.vitalMax[1],Scale * 2, canvas.height - Scale * 2);
+    ctx.fillText("Strength: " + Protag.vitalMax[2], Scale * 2, canvas.height - Scale * 1);
+    menuBuild[0].text = "Level UP";
+    menuBuild[1].text = "Camp";
+    menuBuild[2].text = "Exit";
+  }
+  
+  function levelUP(){
+    menuBuild[3] = new SelectionTier(Scale * 11, Scale * (11));
+    menuBuild[4] = new SelectionTier(Scale * 11, Scale * (12.5));
+    menuBuild[5] = new SelectionTier(Scale * 11, Scale * (14));
+    
+    menuBuild[3].text = "Health";
+    menuBuild[4].text = "Endurance";
+    menuBuild[5].text = "Strength";  
+  }
+  
+  //menu segments
   class SelectionTier {
     constructor(x, y) {
       this.x = x;
@@ -176,13 +222,76 @@ class Player {
       this.selected = false;
     }
     draw() {
+      ctx.fillStyle = "black";
+      ctx.fillText(this.text, this.x + 2, this.y + this.size / 2);
       if (this.selected) {
-        fill(20 * sin(frameCount / 20) + 200);
+        ctx.fillStyle = "red";
       } else {
-        fill(255);
+        ctx.fillStyle ="rgba(0, 0, 200, 0)";
       }
       rect(this.x, this.y, this.size * 2, this.size);
-      fill(0);
-      text(this.text, this.x + 2, this.y + this.size / 2);
     }
   }
+
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+  
+
+
+function rect(x,y,w,h){
+    ctx.beginPath();
+    ctx.fillRect(x,y,w,h);
+    ctx.fillStyle = "black";
+    ctx.rect(x,y,w,h);
+    ctx.stroke();
+}
+
+//controls
+window.addEventListener("keyup", function (e) {
+    //gamescreen navigation
+    //directions are 0 = up 1 = left 2 = down 3 = right
+    if (screenSpace == 1) {
+      if (e.key == "ArrowUp") {
+        Protag.motion(0);
+      }
+      if (e.key == "ArrowLeft") {
+        Protag.motion(1);
+      }
+      if (e.key == "ArrowDown") {
+        Protag.motion(2);
+      }
+      if (e.key == "ArrowRight") {
+        Protag.motion(3);
+      }
+    }
+  
+    //menu navigation
+    if (screenSpace == 3) {
+      if (e.key == "ArrowUp") {
+        if (menuSelect === 0) {
+          menuSelect = menuBuild.length - 1;
+        } else {
+          menuSelect += -1;
+        }
+      }
+      if (e.key == "ArrowDown") {
+        if (menuSelect == menuBuild.length - 1) {
+          menuSelect = 0;
+        } else {
+          menuSelect += 1;
+        }
+      }
+    }
+  
+    if (e.key == "z") {
+      Affirm();
+      //game start button
+      if (screenSpace === 0) {
+        screenSpace = 1;
+      }
+    }
+  });
+  
+
+init();
