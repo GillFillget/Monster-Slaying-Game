@@ -11,6 +11,7 @@ let menuSelect = 0;
 //0 is a title screen, 1 is navigating, 2 is fight screen, 3 is player menu
 let screenSpace = 0;
 let menuBuild = [];
+let nightTime = 0;
 
 
 function init(){
@@ -40,14 +41,14 @@ function draw(){
             Display.fight();
           }
           if (screenSpace == 3) {
-            Display.menu();
             for (i = 0; i < menuBuild.length; i++) {
               menuBuild[i].draw();
               menuBuild[i].selected = false;
               menuBuild[menuSelect].selected = true;
             }
+            Display.menu();
           }
-    ctx.fillStyle = "rgba(200, 200, 200, 0.1)";
+    ctx.fillStyle = "rgba(200, 200, 200, 0.2)";
     rect(0,0,canvas.width,canvas.height);
     window.requestAnimationFrame(draw);
 }
@@ -61,14 +62,15 @@ class Player {
       this.scale = Scale;
     }
     draw() {
-      rect(this.position[0], this.position[1], this.scale, this.scale);
+        ctx.fillStyle = "black";
+        rect(this.position[0], this.position[1], this.scale, this.scale);
     }
     motion(direction) {
       //directions are 0 = up 1 = left 2 = down 3 = right
       if (direction === 0) {
         this.position[1] += this.scale * -1;
         if (this.position[1] < 0) {
-          this.position[1] = canvas.height - this.scale * 2;
+          this.position[1] = canvas.height - this.scale;
           regenField();
         }
         for (i = 0; i < RockCount; i++) {
@@ -91,7 +93,7 @@ class Player {
       }
       if (direction == 2) {
         this.position[1] += this.scale;
-        if (this.position[1] > canvas.height - this.scale * 2) {
+        if (this.position[1] > canvas.height - this.scale) {
           this.position[1] = 0;
           regenField();
         }
@@ -129,12 +131,10 @@ class Player {
 
   class ScreenMode {
     title() {
-      //rect(0,0,canvas.width,canvas.height);
       ctx.fillStyle = 'black';
       ctx.fillText("Press Z to explore the shifting fields to battle monsters and get stronger",Scale * 5,200);
     }
     game() {
-      //rect(0,0,canvas.width,canvas.height);
       ctx.fillStyle = 'black';
       Protag.draw();
       for (i = 0; i < RockCount; i++) {
@@ -162,7 +162,7 @@ class Player {
 function Affirm() {
     if (screenSpace == 3) {
       if (menuSelect == 0&&Protag.exp[1]>=100) {
-        menuSelect = 3;
+        menuSelect = 0;
         levelUP();
       } else if (menuSelect == 1) {
         Protag.currentVital[0] += Protag.vitalMax[0] / 2;
@@ -174,6 +174,41 @@ function Affirm() {
         menuSelect = 0;
         while(menuBuild.length > 3){
           menuBuild.pop();
+        }
+      }
+      if(Protag.exp[1]>=100&&menuSelect == 3){
+        menuSelect = 0;
+        Protag.exp[0] += 1;
+        Protag.exp[1] += -100;
+        Protag.vitalMax[0] += 10;
+        Protag.currentVital[0] += 10;
+        if(Protag.exp[1]<100){
+            while(menuBuild.length > 3){
+                menuBuild.pop();
+            }
+        }
+      }
+      if(Protag.exp[1]>=100&&menuSelect == 4){
+        menuSelect = 0;
+        Protag.exp[0] += 1;
+        Protag.exp[1] += -100;
+        Protag.vitalMax[1] += 10;
+        Protag.currentVital[1] += 10;
+        if(Protag.exp[1]<100){
+            while(menuBuild.length > 3){
+                menuBuild.pop();
+            }
+        }
+      }
+      if(Protag.exp[1]>=100&&menuSelect == 5){
+        menuSelect = 0;
+        Protag.exp[0] += 1;
+        Protag.exp[1] += -100;
+        Protag.vitalMax[2] += 5;
+        if(Protag.exp[1]<100){
+            while(menuBuild.length > 3){
+                menuBuild.pop();
+            }
         }
       }
     } else if (screenSpace == 1) {
@@ -189,8 +224,7 @@ function Affirm() {
   }
   
   function playerMenu() {
-    ctx.fillStyle = "rgba(0, 0, 200, 0)";
-    rect(0, canvas.height - Scale * 6, canvas.width, Scale * 6);
+    
     ctx.fillStyle = 'black';
     ctx.fillText("Level: " + Protag.exp[0], Scale * 2, canvas.height - Scale * 5);
     ctx.fillText("Experience: " + Protag.exp[1], Scale * 2, canvas.height - Scale * 4);
@@ -200,6 +234,13 @@ function Affirm() {
     menuBuild[0].text = "Level UP";
     menuBuild[1].text = "Camp";
     menuBuild[2].text = "Exit";
+    ctx.fillStyle = "rgba(180, 180, 180, 1)";
+    rect(0, canvas.height - Scale * 6, canvas.width, Scale * 6);
+    Protag.draw();
+    for (i = 0; i < RockCount; i++) {
+        ctx.fillStyle = 'grey';
+        Rock[i].draw();
+      }
   }
   
   function levelUP(){
@@ -209,7 +250,7 @@ function Affirm() {
     
     menuBuild[3].text = "Health";
     menuBuild[4].text = "Endurance";
-    menuBuild[5].text = "Strength";  
+    menuBuild[5].text = "Strength"; 
   }
   
   //menu segments
@@ -268,6 +309,22 @@ window.addEventListener("keyup", function (e) {
   
     //menu navigation
     if (screenSpace == 3) {
+        if(menuBuild.length>3){
+            if (e.key == "ArrowDown") {
+                if (menuSelect == menuBuild.length - 1) {
+                  menuSelect = 3;
+                } else {
+                  menuSelect += 1;
+                }
+              }
+              if (e.key == "ArrowUp") {
+                if (menuSelect == 3) {
+                  menuSelect = menuBuild.length - 1;
+                } else {
+                  menuSelect += -1;
+                }
+              }
+          }else{
       if (e.key == "ArrowUp") {
         if (menuSelect === 0) {
           menuSelect = menuBuild.length - 1;
@@ -282,10 +339,20 @@ window.addEventListener("keyup", function (e) {
           menuSelect += 1;
         }
       }
+      if (e.key == "ArrowLeft") {
+        menuSelect = (menuBuild.length-1) - menuSelect;
+        if(menuSelect<0){menuSelect = 0}
+        console.log(menuSelect)
+      }
+    }
     }
   
     if (e.key == "z") {
       Affirm();
+
+      if (screenSpace == 3&&menuBuild.length>3) {
+        menuSelect = 3;
+      }
       //game start button
       if (screenSpace === 0) {
         screenSpace = 1;
