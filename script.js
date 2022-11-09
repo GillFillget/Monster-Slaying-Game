@@ -69,7 +69,7 @@ class Player {
   constructor() {
     this.position = [0, 0];
     this.exp = [0, 100];
-    this.vitalMax = [100, 100, 10];
+    this.vitalMax = [100, 100, 5];
     this.currentVital = [100, 100];
     this.scale = Scale;
   }
@@ -241,6 +241,10 @@ function Affirm() {
   } else if (screenSpace == 1) {
     screenSpace = 3;
   }
+
+  if(screenSpace == 2){
+    combatGO();
+  }
 }
 
 //regenerates the field everytime you leave the bounds
@@ -375,6 +379,35 @@ function fightMenu(){
   ctx.fillStyle = "rgba(180, 180, 180, 1)";
 
   rect(0, canvas.height - Scale * 9, canvas.width, Scale * 9);
+}
+
+//handles fight elements
+function combatGO(){
+  if(menuSelect === 0){
+    let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*100
+    if(hitChance >= parseInt(random(1,100))){
+      console.log("hit")
+    }
+  }
+  if(menuSelect == 1){
+    let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*50
+    if(hitChance >= parseInt(random(1,100))){
+      console.log("hit")
+    }
+  }
+  if(menuSelect == 2){
+    
+  }
+  if(menuSelect == 3){
+    let randomChance = 80 - Protag.exp[0]
+    if(randomChance < 0){
+      randomChance = 0;
+    }
+    if(randomChance >= parseInt(random(1,100))){
+      screenSpace = 1;
+      menuSelect = 0;
+    }
+  }
 }
 
 //returns random value within specified range
