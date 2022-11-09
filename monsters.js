@@ -77,7 +77,7 @@ class Zombie {
 const monsterList = [Deadite,Werewolf,Karen,Peter_Griffin,Ghost,Dracula,Gaston,Witch,Zombie];
 
 function randomMonster(){
-    backgroundMonster = new monsterList[parseInt(random(0,8))](100,5);
+    backgroundMonster = new monsterList[parseInt(random(0,8))]((Protag.exp[0]+1)*10,4);
 }
 
 //----Final Boss----//

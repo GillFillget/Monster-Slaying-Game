@@ -7,7 +7,6 @@ let Scale;
 let Rock = [];
 let RockCount = 30;
 let menuSelect = 0;
-//screenspace is the type of screen the player is currently in
 //0 is a title screen, 1 is navigating, 2 is fight screen, 3 is player menu
 let screenSpace = 0;
 let menuBuild = [];
@@ -41,6 +40,10 @@ function draw() {
   ctx.globalCompositeOperation = "destination-over";
   ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
   //looping code
+
+  if(Protag.currentVital[0] < 0){
+    death();
+  }
 
   ctx.fillStyle = "black";
   ctx.fillText(bottomTextInput, Scale * 2.5, canvas.height - (Scale/2));
@@ -77,7 +80,7 @@ function draw() {
 class Player {
   constructor() {
     this.position = [0, 0];
-    this.exp = [0, 100];
+    this.exp = [0, 0];
     this.vitalMax = [100, 100, 5];
     this.currentVital = [100, 100];
     this.scale = Scale;
@@ -188,6 +191,8 @@ function campOut() {
     Protag.currentVital[0] = Protag.vitalMax[0];
   }
   Protag.currentVital[1] = Protag.vitalMax[1];
+  fightturn = 1;
+  protagDefense = 0.5;
   encounterChance(60);
 }
 
@@ -342,15 +347,21 @@ function encounterChance(encounterValue) {
 
 //menu for fight controls
 function fightMenu(){
-  if(fightTurn == 1){
-    Protag.currentVital[0] += (-1 * backgroundMonster.Power/protagDefense)
-    fightTurn = 0;
-  }
   if(backgroundMonster.Health > 0){
     ctx.fillStyle = "grey";
     rect(canvas.width - Scale * 8, Scale * 2,Scale * 2,Scale * 2);
     ctx.fillStyle = "black";
     ctx.fillText(backgroundMonster.Sound, 5 + canvas.width - Scale * 6, Scale * 2.1);
+
+    if(fightTurn == 1){
+      Protag.currentVital[0] += (-1 * backgroundMonster.Power/protagDefense)
+      protagDefense = 1;
+      fightTurn = 0;
+    }
+
+  }else{
+    Protag.exp[1] += 20;
+    screenSpace = 1
   }
   
   let protagHealthPer = Protag.currentVital[0]/Protag.vitalMax[0];
@@ -394,7 +405,7 @@ function fightMenu(){
   ctx.fillStyle = "rgba(0, 255 , 0 ,1)";
   rect(Scale * 2, canvas.height - Scale * 6,(Scale * 4) * protagEndPer,Scale)
   ctx.fillStyle = "rgba(255, 0, 0, 1)";
-  rect(Scale * 2, canvas.height - Scale * 8, Scale * 4, Scale);
+  rect(Scale * 2, canvas.height - Scale * 6, Scale * 4, Scale);
   ctx.fillStyle = "rgba(180, 180, 180, 1)";
 
   rect(0, canvas.height - Scale * 9, canvas.width, Scale * 9);
@@ -402,15 +413,22 @@ function fightMenu(){
 
 //handles fight elements
 function combatGO(){
-  console.log(damageMult)
   if(fightTurn === 0){
     if(menuSelect === 0){
       let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*100
       if(hitChance >= parseInt(random(1,100))){
+        if(Protag.currentVital[1]<0){
+          damageMult = 0;
+          bottomTextInput = "You are too weak to fight"
+        }else{
+          damageMult = 1;
+          Protag.currentVital[1] += -10
+        }
+        backgroundMonster.Health += (-1 * Protag.vitalMax[2])*damageMult
         fightTurn = 1;
-        damageMult = 1;
         menuSelect = 0;
       }else{
+        Protag.currentVital[1] += -10
         fightTurn = 1;
         bottomTextInput = "missed"
       }
@@ -418,16 +436,25 @@ function combatGO(){
     if(menuSelect == 1){
       let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*50
       if(hitChance >= parseInt(random(1,100))){
+        if(Protag.currentVital[1]<0){
+          damageMult = 0;
+          bottomTextInput = "You are too weak to fight"
+        }else{
+          damageMult = 2;
+          Protag.currentVital[1] += -20
+        }
+        backgroundMonster.Health += (-1 * Protag.vitalMax[2])*damageMult
         fightTurn = 1;
-        damageMult = 2;
         menuSelect = 0;
       }else{
+        Protag.currentVital[1] += -20
         fightTurn = 1;
         bottomTextInput = "missed"
       }
     }
     if(menuSelect == 2){
-    
+      protagDefense = 2;
+      fightTurn = 1;
     }
     if(menuSelect == 3){
       let randomChance = 80 - Protag.exp[0]
@@ -440,6 +467,12 @@ function combatGO(){
       }
     }
   }
+}
+
+function death(){
+  ctx.fillStyle = "black";
+  rect(0,0,canvas.width,canvas.height);
+  location.reload();
 }
 
 //returns random value within specified range
