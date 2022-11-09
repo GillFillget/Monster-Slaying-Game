@@ -78,8 +78,6 @@ const monsterList = [Deadite,Werewolf,Karen,Peter_Griffin,Ghost,Dracula,Gaston,W
 
 function randomMonster(){
     backgroundMonster = new monsterList[parseInt(random(0,8))](100,5);
-    midgroundMonster = new monsterList[parseInt(random(0,8))](100,5);
-    foregroundMonster = new monsterList[parseInt(random(0,8))](100,5);
 }
 
 //----Final Boss----//

@@ -14,9 +14,9 @@ let menuBuild = [];
 let fightMenuBuild = [];
 let frameCount = 0;
 let bottomTextInput = "";
-let selectedTarget = 0;
 let fightTurn = 0;
 let damageMult = 1;
+let protagDefense = 1;
 
 function init() {
   Scale = canvas.width / 20;
@@ -43,7 +43,7 @@ function draw() {
   //looping code
 
   ctx.fillStyle = "black";
-  ctx.fillText(bottomTextInput, Scale * 2.5, canvas.height - Scale);
+  ctx.fillText(bottomTextInput, Scale * 2.5, canvas.height - (Scale/2));
 
   if (screenSpace === 0) {
     bottomTextInput = "Welcome to Game, Press Z to begin"
@@ -55,9 +55,7 @@ function draw() {
   if (screenSpace == 2) {
     for (i = 0; i < fightMenuBuild.length; i++) {
       fightMenuBuild[i].selected = false;
-      if(fightTurn === 0){
-        fightMenuBuild[menuSelect].selected = true;
-      }
+      fightMenuBuild[menuSelect].selected = true;
       fightMenuBuild[i].draw();
     }
     Display.fight();
@@ -338,37 +336,15 @@ function encounterChance(encounterValue) {
   if(monsterChance <= encounterValue){
     screenSpace = 2;
     randomMonster();
-    bottomTextInput = backgroundMonster.constructor.name + ", " + midgroundMonster.constructor.name + ", and " + foregroundMonster.constructor.name + " all want to fight"
+    bottomTextInput = backgroundMonster.constructor.name + " wants to fight"
   }
 }
 
 //menu for fight controls
 function fightMenu(){
-
   if(fightTurn == 1){
-    ctx.fillStyle = "white";
-    if(menuSelect == 3){
-      rect(canvas.width - Scale * 6, Scale * 4,Scale * 2,Scale * 2);
-    }
-    if(menuSelect == 2){
-      rect(canvas.width - Scale * 7, Scale * 3,Scale * 2,Scale * 2);
-    }
-    if(menuSelect == 1){
-      rect(canvas.width - Scale * 8, Scale * 2,Scale * 2,Scale * 2);
-    }
-  }
-
-  if(foregroundMonster.Health > 0){
-    ctx.fillStyle = "grey";
-    rect(canvas.width - Scale * 6, Scale * 4,Scale * 2,Scale * 2);
-    ctx.fillStyle = "black";
-    ctx.fillText(foregroundMonster.Sound, 5 + canvas.width - Scale * 4, Scale * 4.1);
-  }
-  if(midgroundMonster.Health > 0){
-    ctx.fillStyle = "grey";
-    rect(canvas.width - Scale * 7, Scale * 3,Scale * 2,Scale * 2);
-    ctx.fillStyle = "black";
-    ctx.fillText(midgroundMonster.Sound, 5 + canvas.width - Scale * 5, Scale * 3.1);
+    Protag.currentVital[0] += (-1 * backgroundMonster.Power/protagDefense)
+    fightTurn = 0;
   }
   if(backgroundMonster.Health > 0){
     ctx.fillStyle = "grey";
@@ -427,37 +403,15 @@ function fightMenu(){
 //handles fight elements
 function combatGO(){
   console.log(damageMult)
-  if(fightTurn == 2){
-    fightTurn = 0;
-  }
-  if(fightTurn == 1){
-    if(menuSelect == 1){
-      backgroundMonster.Health += ((-1 * Protag.vitalMax[2]) * damageMult);
-      fightTurn = 2;
-      bottomTextInput = "Dealt " + Protag.vitalMax[2] + " damage to " + backgroundMonster.constructor.name;
-    }
-    if(menuSelect == 2){
-      midgroundMonster.Health += ((-1 * Protag.vitalMax[2]) * damageMult);
-      fightTurn = 2;
-      bottomTextInput = "Dealt " + Protag.vitalMax[2] + " damage to " + midgroundMonster.constructor.name;
-    }
-    if(menuSelect == 3){
-      foregroundMonster.Health += ((-1 * Protag.vitalMax[2]) * damageMult);
-      fightTurn = 2;
-      bottomTextInput = "Dealt " + Protag.vitalMax[2] + " damage to " + foregroundMonster.constructor.name;
-    }
-    menuSelect = 0;
-  }
   if(fightTurn === 0){
     if(menuSelect === 0){
       let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*100
       if(hitChance >= parseInt(random(1,100))){
         fightTurn = 1;
         damageMult = 1;
-        menuSelect = 1;
-        bottomTextInput = "Select Target with up and down"
+        menuSelect = 0;
       }else{
-        fightTurn = 2;
+        fightTurn = 1;
         bottomTextInput = "missed"
       }
     }
@@ -466,10 +420,9 @@ function combatGO(){
       if(hitChance >= parseInt(random(1,100))){
         fightTurn = 1;
         damageMult = 2;
-        menuSelect = 1;
-        bottomTextInput = "Select Target with up and down"
+        menuSelect = 0;
       }else{
-        fightTurn = 2;
+        fightTurn = 1;
         bottomTextInput = "missed"
       }
     }
@@ -576,25 +529,6 @@ window.addEventListener("keyup", function (e) {
         } else {
           menuSelect += 1;
         }
-      }
-    }
-    if(fightTurn == 1){
-      if (e.key == "ArrowUp") {
-        if (menuSelect == 1) {
-          menuSelect = 3;
-        } else {
-          menuSelect += -1;
-        }
-      }
-      if (e.key == "ArrowDown") {
-        if (menuSelect == 3) {
-          menuSelect = 1;
-        } else {
-          menuSelect += 1;
-        }
-      }
-      if (e.key == "z") {
-        combatGO();
       }
     }
   }
