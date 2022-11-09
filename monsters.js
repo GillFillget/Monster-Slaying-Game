@@ -1,5 +1,3 @@
-const monsterList = [Deadite,Werewolf,Karen,Peter_Griffin,Ghost,Dracula,Gaston,Witch,Zombie];
-
 class Deadite {
     constructor(Health, Sound, Power){
         this.Health = Health;
@@ -71,6 +69,8 @@ class Zombie {
         this.Sound = "arrhh!";
     }
 }
+
+const monsterList = [Deadite,Werewolf,Karen,Peter_Griffin,Ghost,Dracula,Gaston,Witch,Zombie];
 
 //----Final Boss----//
 class UnmatchedPowerOfTheSun {

@@ -11,7 +11,7 @@ let menuSelect = 0;
 //0 is a title screen, 1 is navigating, 2 is fight screen, 3 is player menu
 let screenSpace = 0;
 let menuBuild = [];
-let nightTime = 0;
+let frameCount = 0;
 
 function init() {
   Scale = canvas.width / 20;
@@ -55,6 +55,7 @@ function draw() {
   }
   ctx.fillStyle = "rgba(200, 200, 200, 0.2)";
   rect(0, 0, canvas.width, canvas.height);
+  frameCount++;
   window.requestAnimationFrame(draw);
 }
 
@@ -151,12 +152,17 @@ class ScreenMode {
       Rock[i].draw();
     }
   }
-  fight() {}
+  fight() {
+    ctx.fillStyle = "black";
+    rect(Scale * 2, Scale * 2, Scale * 3, Scale * 3);
+    fightMenu();
+  }
   menu() {
     playerMenu();
   }
 }
 
+//makes the random obsticals on the field
 class Stone {
   constructor(x, y) {
     this.position = [x, y];
@@ -167,14 +173,17 @@ class Stone {
   }
 }
 
+//heals the player and haves a higher chance of fight
 function campOut() {
   Protag.currentVital[0] += Protag.vitalMax[0] / 2;
   if (Protag.currentVital[0] > Protag.vitalMax[0]) {
     Protag.currentVital[0] = Protag.vitalMax[0];
   }
   Protag.currentVital[1] = Protag.vitalMax[1];
+  encounterChance(60);
 }
 
+//allows for single button to be used for multiple actions
 function Affirm() {
   if (screenSpace == 3) {
     if (menuSelect == 0 && Protag.exp[1] >= 100) {
@@ -228,6 +237,7 @@ function Affirm() {
   }
 }
 
+//regenerates the field everytime you leave the bounds
 function regenField() {
   for (i = 0; i < RockCount; i++) {
     Rock[i].position[0] = Scale * parseInt(random(1, canvas.width / Scale - 1));
@@ -236,6 +246,7 @@ function regenField() {
   }
 }
 
+//makes bottom of screen menu
 function playerMenu() {
   ctx.fillStyle = "black";
   ctx.fillText("Level: " + Protag.exp[0], Scale * 2, canvas.height - Scale * 5);
@@ -271,6 +282,7 @@ function playerMenu() {
   }
 }
 
+//brings the levelup screen
 function levelUP() {
   menuBuild[3] = new SelectionTier(Scale * 11, canvas.height - Scale * 5.5);
   menuBuild[4] = new SelectionTier(Scale * 11, canvas.height - Scale * 4);
@@ -302,8 +314,41 @@ class SelectionTier {
   }
 }
 
-function encounterChance() {}
+//makes a percent chance of encountering monster
+function encounterChance(encounterValue) {
+  let monsterChance = parseInt(random(1,100))
+  if(monsterChance <= encounterValue){
+    screenSpace = 2;
+  }
+}
 
+//menu for fight controls
+function fightMenu(){
+  let protagHealthPer = Protag.currentVital[0]/Protag.vitalMax[0];
+  if(protagHealthPer < 0){
+    protagHealthPer = 0;
+  }
+  let protagEndPer = Protag.currentVital[1]/Protag.vitalMax[1];
+  if(protagEndPer < 0){
+    protagEndPer = 0;
+  }
+  //health bar
+  ctx.fillStyle = "rgba(0, 255 , 0 ,1)";
+  rect(Scale * 2, canvas.height - Scale * 8,(Scale * 4) * protagHealthPer,Scale)
+  ctx.fillStyle = "rgba(255, 0, 0, 1)";
+  rect(Scale * 2, canvas.height - Scale * 8, Scale * 4, Scale);
+
+  //endurance bar
+  ctx.fillStyle = "rgba(0, 255 , 0 ,1)";
+  rect(Scale * 2, canvas.height - Scale * 6,(Scale * 4) * protagEndPer,Scale)
+  ctx.fillStyle = "rgba(255, 0, 0, 1)";
+  rect(Scale * 2, canvas.height - Scale * 8, Scale * 4, Scale);
+  ctx.fillStyle = "rgba(180, 180, 180, 1)";
+
+  rect(0, canvas.height - Scale * 9, canvas.width, Scale * 9);
+}
+
+//returns random value within specified range
 function random(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -323,19 +368,19 @@ window.addEventListener("keyup", function (e) {
   if (screenSpace == 1) {
     if (e.key == "ArrowUp") {
       Protag.motion(0);
-      encounterChance();
+      encounterChance(15);
     }
     if (e.key == "ArrowLeft") {
       Protag.motion(1);
-      encounterChance();
+      encounterChance(15);
     }
     if (e.key == "ArrowDown") {
       Protag.motion(2);
-      encounterChance();
+      encounterChance(15);
     }
     if (e.key == "ArrowRight") {
       Protag.motion(3);
-      encounterChance();
+      encounterChance(15);
     }
   }
 
