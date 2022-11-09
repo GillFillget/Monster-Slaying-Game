@@ -464,6 +464,8 @@ function combatGO(){
       if(randomChance >= parseInt(random(1,100))){
         screenSpace = 1;
         menuSelect = 0;
+      }else{
+        fightTurn = 1;
       }
     }
   }
