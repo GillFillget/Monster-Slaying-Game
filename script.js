@@ -13,6 +13,9 @@ let screenSpace = 0;
 let menuBuild = [];
 let fightMenuBuild = [];
 let frameCount = 0;
+let bottomTextInput = "";
+let selectedTarget = 0;
+let fightTurn = 0;
 
 function init() {
   Scale = canvas.width / 20;
@@ -37,16 +40,23 @@ function draw() {
   ctx.globalCompositeOperation = "destination-over";
   ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
   //looping code
+
+  ctx.fillStyle = "black";
+  ctx.fillText(bottomTextInput, Scale * 2.5, canvas.height - Scale);
+
   if (screenSpace === 0) {
-    Display.title();
+    bottomTextInput = "Welcome to Game, Press Z to begin"
   }
   if (screenSpace == 1) {
     Display.game();
+    bottomTextInput = "Explore the field to encounter enemies"
   }
   if (screenSpace == 2) {
     for (i = 0; i < fightMenuBuild.length; i++) {
       fightMenuBuild[i].selected = false;
-      fightMenuBuild[menuSelect].selected = true;
+      if(fightTurn === 0){
+        fightMenuBuild[menuSelect].selected = true;
+      }
       fightMenuBuild[i].draw();
     }
     Display.fight();
@@ -142,14 +152,6 @@ class Player {
 }
 
 class ScreenMode {
-  title() {
-    ctx.fillStyle = "black";
-    ctx.fillText(
-      "Press Z to explore the shifting fields to battle monsters and get stronger",
-      Scale * 5,
-      200
-    );
-  }
   game() {
     ctx.fillStyle = "black";
     Protag.draw();
@@ -181,6 +183,7 @@ class Stone {
 
 //heals the player and haves a higher chance of fight
 function campOut() {
+  bottomTextInput = "Got a good nights rest"
   Protag.currentVital[0] += Protag.vitalMax[0] / 2;
   if (Protag.currentVital[0] > Protag.vitalMax[0]) {
     Protag.currentVital[0] = Protag.vitalMax[0];
@@ -214,6 +217,7 @@ function Affirm() {
           menuBuild.pop();
         }
       }
+      bottomTextInput = "You grow stronger"
     }
     if (Protag.exp[1] >= 100 && menuSelect == 4) {
       menuSelect = 0;
@@ -226,6 +230,7 @@ function Affirm() {
           menuBuild.pop();
         }
       }
+      bottomTextInput = "You grow stronger"
     }
     if (Protag.exp[1] >= 100 && menuSelect == 5) {
       menuSelect = 0;
@@ -237,6 +242,7 @@ function Affirm() {
           menuBuild.pop();
         }
       }
+      bottomTextInput = "You grow stronger"
     }
   } else if (screenSpace == 1) {
     screenSpace = 3;
@@ -259,26 +265,26 @@ function regenField() {
 //makes bottom of screen menu
 function playerMenu() {
   ctx.fillStyle = "black";
-  ctx.fillText("Level: " + Protag.exp[0], Scale * 2, canvas.height - Scale * 5);
+  ctx.fillText("Level: " + Protag.exp[0], Scale * 2, canvas.height - Scale * 5.5);
   ctx.fillText(
     "Experience: " + Protag.exp[1],
     Scale * 2,
-    canvas.height - Scale * 4
+    canvas.height - Scale * 4.5
   );
   ctx.fillText(
     "Health: " + Protag.currentVital[0] + "/" + Protag.vitalMax[0],
     Scale * 2,
-    canvas.height - Scale * 3
+    canvas.height - Scale * 3.5
   );
   ctx.fillText(
     "Stamina: " + Protag.currentVital[1] + "/" + Protag.vitalMax[1],
     Scale * 2,
-    canvas.height - Scale * 2
+    canvas.height - Scale * 2.5
   );
   ctx.fillText(
     "Strength: " + Protag.vitalMax[2],
     Scale * 2,
-    canvas.height - Scale * 1
+    canvas.height - Scale * 1.5
   );
   menuBuild[0].text = "Level UP";
   menuBuild[1].text = "Camp";
@@ -294,6 +300,7 @@ function playerMenu() {
 
 //brings the levelup screen
 function levelUP() {
+  bottomTextInput = "Select what to improve"
   menuBuild[3] = new SelectionTier(Scale * 11, canvas.height - Scale * 5.5);
   menuBuild[4] = new SelectionTier(Scale * 11, canvas.height - Scale * 4);
   menuBuild[5] = new SelectionTier(Scale * 11, canvas.height - Scale * 2.5);
@@ -329,11 +336,37 @@ function encounterChance(encounterValue) {
   let monsterChance = parseInt(random(1,100))
   if(monsterChance <= encounterValue){
     screenSpace = 2;
+    randomMonster();
+    bottomTextInput = backgroundMonster.constructor.name + ", " + midgroundMonster.constructor.name + ", and " + foregroundMonster.constructor.name + " all want to fight"
   }
 }
 
 //menu for fight controls
 function fightMenu(){
+
+  if(fightTurn == 1){
+    
+  }
+
+  if(foregroundMonster.Health > 0){
+    ctx.fillStyle = "grey";
+    rect(canvas.width - Scale * 6, Scale * 4,Scale * 2,Scale * 2)
+    ctx.fillStyle = "black";
+    ctx.fillText(foregroundMonster.Sound, 5 + canvas.width - Scale * 4, Scale * 4.1);
+  }
+  if(midgroundMonster.Health > 0){
+    ctx.fillStyle = "grey";
+    rect(canvas.width - Scale * 7, Scale * 3,Scale * 2,Scale * 2)
+    ctx.fillStyle = "black";
+    ctx.fillText(midgroundMonster.Sound, 5 + canvas.width - Scale * 5, Scale * 3.1);
+  }
+  if(backgroundMonster.Health > 0){
+    ctx.fillStyle = "grey";
+    rect(canvas.width - Scale * 8, Scale * 2,Scale * 2,Scale * 2)
+    ctx.fillStyle = "black";
+    ctx.fillText(backgroundMonster.Sound, 5 + canvas.width - Scale * 6, Scale * 2.1);
+  }
+  
   let protagHealthPer = Protag.currentVital[0]/Protag.vitalMax[0];
   if(protagHealthPer < 0){
     protagHealthPer = 0;
@@ -383,29 +416,41 @@ function fightMenu(){
 
 //handles fight elements
 function combatGO(){
-  if(menuSelect === 0){
-    let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*100
-    if(hitChance >= parseInt(random(1,100))){
-      console.log("hit")
+  if(fightTurn === 0){
+    if(menuSelect === 0){
+      let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*100
+      if(hitChance >= parseInt(random(1,100))){
+        fightTurn = 1;
+        menuSelect = 0;
+        bottomTextInput = "Select Target with up and down"
+      }else{
+        fightTurn = 2;
+        bottomTextInput = "missed"
+      }
     }
-  }
-  if(menuSelect == 1){
-    let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*50
-    if(hitChance >= parseInt(random(1,100))){
-      console.log("hit")
+    if(menuSelect == 1){
+      let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*50
+      if(hitChance >= parseInt(random(1,100))){
+        fightTurn = 1;
+        menuSelect = 0;
+        bottomTextInput = "Select Target with up and down"
+      }else{
+        fightTurn = 2;
+        bottomTextInput = "missed"
+      }
     }
-  }
-  if(menuSelect == 2){
+    if(menuSelect == 2){
     
-  }
-  if(menuSelect == 3){
-    let randomChance = 80 - Protag.exp[0]
-    if(randomChance < 0){
-      randomChance = 0;
     }
-    if(randomChance >= parseInt(random(1,100))){
-      screenSpace = 1;
-      menuSelect = 0;
+    if(menuSelect == 3){
+      let randomChance = 80 - Protag.exp[0]
+      if(randomChance < 0){
+        randomChance = 0;
+      }
+      if(randomChance >= parseInt(random(1,100))){
+        screenSpace = 1;
+        menuSelect = 0;
+      }
     }
   }
 }

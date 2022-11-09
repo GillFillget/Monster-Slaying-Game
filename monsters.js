@@ -1,5 +1,9 @@
+let backgroundMonster;
+let midgroundMonster;
+let foregroundMonster;
+
 class Deadite {
-    constructor(Health, Sound, Power){
+    constructor(Health, Power){
         this.Health = Health;
         this.Power = Power;
         this.Sound = "I'LL SWALLOW YOUR SOUL!";
@@ -7,7 +11,7 @@ class Deadite {
 }
 
 class Werewolf {
-    constructor(Health, Sound, Power){
+    constructor(Health, Power){
         this.Health = Health;
         this.Power = Power;
         this.Sound = "rawwhh!";
@@ -15,7 +19,7 @@ class Werewolf {
 }
 
 class Karen {
-    constructor(Health, Sound, Power){
+    constructor(Health, Power){
         this.Health = Health;
         this.Power = Power;
         this.Sound = "How DARE you speak to me that way!";
@@ -23,7 +27,7 @@ class Karen {
 }
 
 class Peter_Griffin{
-    constructor(Health, Sound, Power){
+    constructor(Health, Power){
         this.Health = Health;
         this.Power = Power;
         this.Sound = "NHEHEHEHEHE";
@@ -31,7 +35,7 @@ class Peter_Griffin{
 }
 
 class Ghost {
-    constructor(Health, Sound, Power){
+    constructor(Health, Power){
         this.Health = Health;
         this.Power = Power;
         this.Sound = "boo...";
@@ -39,7 +43,7 @@ class Ghost {
 }
 
 class Dracula {
-    constructor(Health, Sound, Power){
+    constructor(Health, Power){
         this.Health = Health;
         this.Power = Power;
         this.Sound = "Whoooo";
@@ -47,7 +51,7 @@ class Dracula {
 }
 
 class Gaston {
-    constructor(Health, Sound, Power){
+    constructor(Health, Power){
         this.Health = Health;
         this.Power = Power;
         this.Sound = "I eat 5 dozen eggs!"
@@ -55,7 +59,7 @@ class Gaston {
 }
 
 class Witch {
-    constructor(Health, Sound, Power){
+    constructor(Health, Power){
         this.Health = Health;
         this.Power = Power;
         this.Sound = "hehehehehe!";
@@ -63,7 +67,7 @@ class Witch {
 }
 
 class Zombie {
-    constructor(Health, Sound, Power){
+    constructor(Health, Power){
         this.Health = Health;
         this.Power = Power;
         this.Sound = "arrhh!";
@@ -71,6 +75,12 @@ class Zombie {
 }
 
 const monsterList = [Deadite,Werewolf,Karen,Peter_Griffin,Ghost,Dracula,Gaston,Witch,Zombie];
+
+function randomMonster(){
+    backgroundMonster = new monsterList[parseInt(random(0,8))](100,5);
+    midgroundMonster = new monsterList[parseInt(random(0,8))](100,5);
+    foregroundMonster = new monsterList[parseInt(random(0,8))](100,5);
+}
 
 //----Final Boss----//
 class UnmatchedPowerOfTheSun {
