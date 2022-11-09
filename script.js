@@ -11,6 +11,7 @@ let menuSelect = 0;
 //0 is a title screen, 1 is navigating, 2 is fight screen, 3 is player menu
 let screenSpace = 0;
 let menuBuild = [];
+let fightMenuBuild = [];
 let frameCount = 0;
 
 function init() {
@@ -43,13 +44,18 @@ function draw() {
     Display.game();
   }
   if (screenSpace == 2) {
+    for (i = 0; i < fightMenuBuild.length; i++) {
+      fightMenuBuild[i].selected = false;
+      fightMenuBuild[menuSelect].selected = true;
+      fightMenuBuild[i].draw();
+    }
     Display.fight();
   }
   if (screenSpace == 3) {
     for (i = 0; i < menuBuild.length; i++) {
-      menuBuild[i].draw();
       menuBuild[i].selected = false;
       menuBuild[menuSelect].selected = true;
+      menuBuild[i].draw();
     }
     Display.menu();
   }
@@ -261,7 +267,7 @@ function playerMenu() {
     canvas.height - Scale * 3
   );
   ctx.fillText(
-    "Endurance: " + Protag.currentVital[1] + "/" + Protag.vitalMax[1],
+    "Stamina: " + Protag.currentVital[1] + "/" + Protag.vitalMax[1],
     Scale * 2,
     canvas.height - Scale * 2
   );
@@ -289,7 +295,7 @@ function levelUP() {
   menuBuild[5] = new SelectionTier(Scale * 11, canvas.height - Scale * 2.5);
 
   menuBuild[3].text = "Health";
-  menuBuild[4].text = "Endurance";
+  menuBuild[4].text = "Stamina";
   menuBuild[5].text = "Strength";
 }
 
@@ -339,6 +345,18 @@ function fightMenu(){
     protagEndPer = 1;
   }
 
+  for(i=0;i<4;i++){
+    fightMenuBuild[i] = new SelectionTier(
+      Scale * 15,
+      canvas.height - Scale * (8 - [i] * 1.5)
+    );
+  }
+
+  fightMenuBuild[0].text = "Attack"
+  fightMenuBuild[1].text = "Strong Attack"
+  fightMenuBuild[2].text = "Defend"
+  fightMenuBuild[3].text = "Flee"
+
   //health bar
   ctx.fillStyle = "black";
   ctx.fillText("Health", Scale * 2.5, canvas.height - Scale * 8.1);
@@ -347,7 +365,9 @@ function fightMenu(){
   ctx.fillStyle = "rgba(255, 0, 0, 1)";
   rect(Scale * 2, canvas.height - Scale * 8, Scale * 4, Scale);
 
-  //endurance bar
+  //stamina bar
+  ctx.fillStyle = "black";
+  ctx.fillText("Stamina", Scale * 2.5, canvas.height - Scale * 6.1);
   ctx.fillStyle = "rgba(0, 255 , 0 ,1)";
   rect(Scale * 2, canvas.height - Scale * 6,(Scale * 4) * protagEndPer,Scale)
   ctx.fillStyle = "rgba(255, 0, 0, 1)";
@@ -425,12 +445,23 @@ window.addEventListener("keyup", function (e) {
           menuSelect += 1;
         }
       }
-      if (e.key == "ArrowLeft") {
-        menuSelect = menuBuild.length - 1 - menuSelect;
-        if (menuSelect < 0) {
-          menuSelect = 0;
-        }
-        console.log(menuSelect);
+    }
+  }
+
+  //fight menu navigation
+  if (screenSpace == 2) {
+    if (e.key == "ArrowUp") {
+      if (menuSelect === 0) {
+        menuSelect = fightMenuBuild.length - 1;
+      } else {
+        menuSelect += -1;
+      }
+    }
+    if (e.key == "ArrowDown") {
+      if (menuSelect == fightMenuBuild.length - 1) {
+        menuSelect = 0;
+      } else {
+        menuSelect += 1;
       }
     }
   }
