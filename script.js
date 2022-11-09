@@ -417,7 +417,7 @@ function combatGO(){
     if(menuSelect === 0){
       let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*100
       if(hitChance >= parseInt(random(1,100))){
-        if(Protag.currentVital[1]<0){
+        if(Protag.currentVital[1]<=0){
           damageMult = 0;
           bottomTextInput = "You are too weak to fight"
         }else{
@@ -436,7 +436,7 @@ function combatGO(){
     if(menuSelect == 1){
       let hitChance = ((((Protag.vitalMax[1]-100)/10)/(Protag.vitalMax[2]/5))+1)*50
       if(hitChance >= parseInt(random(1,100))){
-        if(Protag.currentVital[1]<0){
+        if(Protag.currentVital[1]<=0){
           damageMult = 0;
           bottomTextInput = "You are too weak to fight"
         }else{
