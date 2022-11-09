@@ -465,6 +465,7 @@ function combatGO(){
         screenSpace = 1;
         menuSelect = 0;
       }else{
+        bottomTextInput = "Failed to flee"
         fightTurn = 1;
       }
     }
