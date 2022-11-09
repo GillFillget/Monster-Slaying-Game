@@ -154,7 +154,7 @@ class ScreenMode {
   }
   fight() {
     ctx.fillStyle = "black";
-    rect(Scale * 2, Scale * 2, Scale * 3, Scale * 3);
+    rect(Scale * 2.5, Scale * 2, Scale * 3, Scale * 3);
     fightMenu();
   }
   menu() {
@@ -328,11 +328,20 @@ function fightMenu(){
   if(protagHealthPer < 0){
     protagHealthPer = 0;
   }
+  if(protagHealthPer > 1){
+    protagHealthPer = 1;
+  }
   let protagEndPer = Protag.currentVital[1]/Protag.vitalMax[1];
   if(protagEndPer < 0){
     protagEndPer = 0;
   }
+  if(protagEndPer > 1){
+    protagEndPer = 1;
+  }
+
   //health bar
+  ctx.fillStyle = "black";
+  ctx.fillText("Health", Scale * 2.5, canvas.height - Scale * 8.1);
   ctx.fillStyle = "rgba(0, 255 , 0 ,1)";
   rect(Scale * 2, canvas.height - Scale * 8,(Scale * 4) * protagHealthPer,Scale)
   ctx.fillStyle = "rgba(255, 0, 0, 1)";
