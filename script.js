@@ -18,7 +18,9 @@ let damageMult = 1;
 let protagDefense = 1;
 
 function init() {
-  Scale = canvas.width / 20;
+  canvas.height = screen.availHeight-150;
+  canvas.width = screen.availWidth-20;
+  Scale = canvas.height / 20;
   Protag = new Player();
   Display = new ScreenMode();
   for (i = 0; i < RockCount; i++) {
