@@ -74,7 +74,23 @@ class Zombie {
     }
 }
 
-const monsterList = [Deadite,Werewolf,Karen,Peter_Griffin,Ghost,Dracula,Gaston,Witch,Zombie];
+class HauntedDoll {
+    constructor(Health, Power){
+        this.Health = Health;
+        this.Power = Power;
+        this.Sound = "Hi, I'm Chucky, wanna play?!";
+    }
+}
+
+class enderman {
+    constructor(Health, Power){
+        this.Health = Health;
+        this.Power = Power;
+        this.Sound = "ooooooooo";
+    }
+}
+
+const monsterList = [Deadite,Werewolf,Karen,Peter_Griffin,Ghost,Dracula,Gaston,Witch,Zombie,HauntedDoll,enderman];
 
 function randomMonster(){
     backgroundMonster = new monsterList[parseInt(random(0,8))]((Protag.exp[0]+1)*10,4);
